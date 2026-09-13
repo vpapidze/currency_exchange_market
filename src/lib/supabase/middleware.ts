@@ -40,33 +40,41 @@ function nextWithRequestHeaders(request: NextRequest) {
 }
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = nextWithRequestHeaders(request);
+  try {
+    return await updateSessionInner(request);
+  } catch {
+    return applyPublicRouting(request, nextWithRequestHeaders(request), null);
+  }
+}
 
+async function updateSessionInner(request: NextRequest) {
+  let supabaseResponse = nextWithRequestHeaders(request);
   const { url: supabaseUrl, publishableKey } = getSupabaseConfig();
-  const supabase = createServerClient(
-    supabaseUrl,
-    publishableKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          supabaseResponse = nextWithRequestHeaders(request);
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          );
-        },
+  const supabase = createServerClient(supabaseUrl, publishableKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        );
+        supabaseResponse = nextWithRequestHeaders(request);
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options),
+        );
       },
     },
-  );
+  });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: { id: string; user_metadata?: Record<string, unknown>; app_metadata?: Record<string, unknown> } | null =
+    null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    return applyPublicRouting(request, supabaseResponse, null);
+  }
 
   const { pathname } = request.nextUrl;
 
@@ -85,12 +93,37 @@ export async function updateSession(request: NextRequest) {
     (user?.app_metadata?.role as string | undefined);
 
   if (user && !role) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-    role = data?.role;
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+      role = data?.role;
+    } catch {
+      role = undefined;
+    }
+  }
+
+  return applyPublicRouting(request, supabaseResponse, user, role);
+}
+
+function applyPublicRouting(
+  request: NextRequest,
+  supabaseResponse: NextResponse,
+  user: { id: string } | null,
+  role?: string,
+) {
+  const { pathname } = request.nextUrl;
+
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".") ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml"
+  ) {
+    return supabaseResponse;
   }
 
   const isAdminPath = pathname.startsWith("/admin");
