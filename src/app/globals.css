@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f3efe6;
+  --foreground: #12241c;
+  --paper: #fffdf8;
+  --ink: #12241c;
+  --pine: #16382c;
+  --leaf: #1f6b4a;
+  --gold: #c9a227;
+  --gold-soft: #f3e4b3;
+  --border: #d8d0c2;
+  --muted: #ebe4d6;
+  --muted-foreground: #5d675f;
+  --danger: #b42318;
+  --success: #067647;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-pine: var(--pine);
+  --color-leaf: var(--leaf);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-sans: var(--font-noto-sans-georgian), var(--font-manrope);
+  --font-display: var(--font-fraunces), var(--font-noto-serif-georgian);
+  --font-mono: var(--font-jetbrains);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.hero-grid {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(201, 162, 39, 0.16), transparent 32%),
+    radial-gradient(circle at 80% 10%, rgba(31, 107, 74, 0.35), transparent 28%),
+    linear-gradient(160deg, #10241c 0%, #1a3d2e 55%, #0d1c16 100%);
 }
