@@ -6,6 +6,7 @@ import {
   localizedPath,
   type Locale,
 } from "@/lib/i18n";
+import { getSupabaseConfig } from "@/lib/supabase/env";
 
 function copyCookies(from: NextResponse, to: NextResponse) {
   from.cookies.getAll().forEach((c) => {
@@ -41,9 +42,10 @@ function nextWithRequestHeaders(request: NextRequest) {
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = nextWithRequestHeaders(request);
 
+  const { url: supabaseUrl, publishableKey } = getSupabaseConfig();
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    supabaseUrl,
+    publishableKey,
     {
       cookies: {
         getAll() {

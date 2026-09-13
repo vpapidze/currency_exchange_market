@@ -30,6 +30,16 @@ where id = (select id from auth.users where email = 'you@email.com');
 
 Admin: [http://localhost:3000/admin](http://localhost:3000/admin).
 
+## Vercel
+
+`.env.local` is not deployed. In **Vercel → Project → Settings → Environment Variables**, add for Production, Preview, and Development:
+
+- `NEXT_PUBLIC_SUPABASE_URL` — `https://rgrjwircfrlqcprladue.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — the publishable key from [API settings](https://supabase.com/dashboard/project/rgrjwircfrlqcprladue/settings/api)
+- `NEXT_PUBLIC_SITE_URL` — your live domain (optional; falls back to `VERCEL_URL`)
+
+Then **Redeploy** the latest deployment. Do not add `DATABASE_URL` or the database password.
+
 ## Roles
 
 - **Client** — `/ka/dashboard` wallet, rates wizard, requests
