@@ -1,10 +1,30 @@
+function resolveSiteUrl() {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (raw) {
+    try {
+      return new URL(raw).origin;
+    } catch {
+      try {
+        return new URL(`https://${raw}`).origin;
+      } catch {
+        /* fall through */
+      }
+    }
+  }
+  const vercel = process.env.VERCEL_URL?.trim();
+  if (vercel) {
+    return `https://${vercel.replace(/^https?:\/\//, "")}`;
+  }
+  return "http://localhost:3000";
+}
+
 export const siteConfig = {
   name: "კურსი",
   nameEn: "Kursi",
   title: "კურსი · Kursi — ვალუტის გაცვლის მარკეტპლეისი",
   description:
     "კურსი აკავშირებს საქართველოს ვალუტის გადამცვლელ კომპანიებს და კლიენტებს. შეადარეთ კურსები, გააკეთეთ მოთხოვნა და დაასრულეთ გაცვლა.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: resolveSiteUrl(),
   locale: "ka_GE",
   keywords: [
     "ვალუტის გაცვლა",
